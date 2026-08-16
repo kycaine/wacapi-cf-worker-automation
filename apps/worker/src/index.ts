@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { Bindings } from './types';
 import { verifyWebhook, handleWebhook } from './controllers/webhook';
-import { getDailyStats, getRecentLogs } from './controllers/stats';
+import { getDailyStats, getRecentLogs, getContacts, getLogsForSender } from './controllers/stats';
 import { adminAuth } from './middlewares/auth';
 import { errorHandler } from './middlewares/errorHandler';
 import { cors } from 'hono/cors';
@@ -19,6 +19,8 @@ app.post('/api/webhook', handleWebhook);
 
 app.get('/api/stats/daily', adminAuth, getDailyStats);
 app.get('/api/stats/logs', adminAuth, getRecentLogs);
+app.get('/api/stats/contacts', adminAuth, getContacts);
+app.get('/api/stats/logs/:number', adminAuth, getLogsForSender);
 
 import { DbService } from './services/dbService';
 

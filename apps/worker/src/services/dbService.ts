@@ -68,9 +68,25 @@ export class DbService {
     return results;
   }
 
-  async getRecentLogsForSender(senderNumber: string, limit = 10): Promise<ChatLog[]> {
+  async getContacts(): Promise<{ sender_number: string; message_text: string; created_at: string }[]> {
+    const query = `
+      SELECT sender_number, message_text, created_at
+      FROM chat_logs
+      WHERE id IN (
+        SELECT MAX(id)
+        FROM chat_logs
+        GROUP BY sender_number
+      )
+      ORDER BY created_at DESC
+      LIMIT 50
+    `;
+    const { results } = await this.env.DB.prepare(query).all();
+    return results as any;
+  }
+
+  async getRecentLogsForSender(senderNumber: string, limit = 50): Promise<ChatLog[]> {
     const { results } = await this.env.DB.prepare(
-      `SELECT * FROM chat_logs WHERE sender_number = ? AND created_at >= datetime('now', '-24 hours') ORDER BY created_at DESC LIMIT ?`
+      `SELECT * FROM chat_logs WHERE sender_number = ? ORDER BY created_at DESC LIMIT ?`
     )
       .bind(senderNumber, limit)
       .all<ChatLog>();

@@ -5,6 +5,8 @@ export type Bindings = {
   WA_ACCESS_TOKEN: string;
   VERIFY_TOKEN: string;
   DASHBOARD_SECRET: string;
+  DASHBOARD_USERNAME?: string;
+  DASHBOARD_PASSWORD?: string;
   ADMIN_NUMBERS: string;
   GEMINI_API_KEY: string;
   GEMINI_MODEL: string;
