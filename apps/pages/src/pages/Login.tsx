@@ -4,8 +4,8 @@ import { ShieldCheck, Loader2 } from 'lucide-react';
 import { login } from '../services/api';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState(import.meta.env.VITE_DEFAULT_USERNAME || '');
-  const [password, setPassword] = useState(import.meta.env.VITE_DEFAULT_PASSWORD || '');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();

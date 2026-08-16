@@ -32,15 +32,15 @@ const DashboardLayout: React.FC = () => {
               <span className="font-bold text-xl text-gray-900">Bot Admin</span>
             </div>
             <nav className="mt-5 px-2 space-y-1">
-              <NavLink to="/overview" className={({ isActive }) => `group flex items-center px-2 py-2 text-base font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
+              <NavLink to="/overview" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `group flex items-center px-2 py-2 text-base font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
                 <LayoutDashboard className="mr-4 h-6 w-6 text-gray-500 group-hover:text-gray-500" />
                 Overview
               </NavLink>
-              <NavLink to="/chats" className={({ isActive }) => `group flex items-center px-2 py-2 text-base font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
+              <NavLink to="/chats" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `group flex items-center px-2 py-2 text-base font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
                 <MessageSquare className="mr-4 h-6 w-6 text-gray-500 group-hover:text-gray-500" />
                 Chat History
               </NavLink>
-              <NavLink to="/stats" className={({ isActive }) => `group flex items-center px-2 py-2 text-base font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
+              <NavLink to="/stats" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `group flex items-center px-2 py-2 text-base font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
                 <BarChart3 className="mr-4 h-6 w-6 text-gray-500 group-hover:text-gray-500" />
                 Statistics
               </NavLink>
