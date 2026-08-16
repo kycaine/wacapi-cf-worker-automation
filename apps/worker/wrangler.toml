@@ -1,0 +1,25 @@
+name = "wa-automation-worker"
+main = "src/index.ts"
+compatibility_date = "2024-09-09"
+compatibility_flags = [ "nodejs_compat" ]
+
+# Bindings
+[[d1_databases]]
+binding = "DB"
+database_name = "wa_automation_db"
+database_id = "62ae9ecf-3ed2-4b7d-9ec3-4de357fbd6f8"
+
+[[kv_namespaces]]
+binding = "KV_STORE"
+id = "a76577452d784661bf10d98505be2d41"
+
+
+[vars]
+GEMINI_MODEL = "gemini-flash-lite-latest"
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "wa-knowledge-index"
+
+[triggers]
+crons = ["0 0 * * *"]
