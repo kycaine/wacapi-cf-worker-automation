@@ -1,137 +1,181 @@
-Act as a Principal Full-Stack Cloudflare Engineer.
+# WhatsApp Admin Assistant Bot & Real-Time Dashboard 🚀
 
-I want to build a complete, production-grade **WhatsApp Admin Assistant Bot & Real-Time Monitoring Dashboard** deployed natively on the Cloudflare ecosystem.
+A production-grade, highly scalable WhatsApp automation suite deployed natively on the **Cloudflare Ecosystem**. 
 
-Please generate a clean-code, scalable monorepo codebase containing two separate workspaces:
-1. `apps/worker`: Backend API & Meta Webhook processor running on **Cloudflare Workers**.
-2. `apps/pages`: Web Monitoring Dashboard deployed on **Cloudflare Pages**.
+This monorepo consists of a WhatsApp chatbot backend powered by Cloudflare Workers (Hono.js) and a real-time monitoring dashboard built with React (Vite) hosted on Cloudflare Pages.
 
 ---
 
-### 1. TECH STACK & ARCHITECTURE
+## 🏗️ Architecture & Tech Stack
 
-#### A. Backend (`apps/worker`)
-* **Runtime:** Cloudflare Workers (TypeScript)
-* **Framework:** Hono.js (Edge-optimized routing)
-* **Database & Persistence:** 
-  - **Cloudflare D1 (SQLite):** To store incoming/outgoing chat logs, unique admin metrics, and execution latency.
-  - **Cloudflare KV:** To store real-time daily usage counters, rate-limits, and session states.
-* **External Integration:** Meta WhatsApp Cloud API (Graph API v20.0+).
+This project is built using a Monorepo structure, separated into two main applications:
 
-#### B. Frontend (`apps/pages`)
-* **Framework:** Vite + React (TypeScript) for a fast, client-side SPA. (Preferred over Next.js Static Export for pure Cloudflare Pages deployments).
-* **Styling:** Tailwind CSS + Lucide Icons (Responsive, modern, clean dashboard UI, Mobile-First).
-* **Data Fetching:** Fetch API / TanStack Query (React Query) connecting to Worker API endpoints.
-* **Charts/Visuals:** Recharts or Chart.js (for daily chat volume, hourly breakdown, latency).
+### 1. Backend (`apps/worker`)
+- **Runtime:** Cloudflare Workers (Edge Computing)
+- **Framework:** [Hono.js](https://hono.dev/) (Ultra-fast web framework for the Edge)
+- **Database:** Cloudflare D1 (Serverless SQLite) for storing chat logs, metrics, and contacts.
+- **State/Cache:** Cloudflare KV for fast key-value lookups (e.g., rate-limiting, session states).
+- **AI Integration:** Google Gemini API (`gemini-flash-lite-latest`) for smart, automated bot replies.
+- **External API:** Meta WhatsApp Cloud API (Graph API v20.0+).
 
----
-
-### 2. CORE FEATURES & MONITORING REQUIREMENTS
-
-1. **WhatsApp Bot Capabilities:**
-   - Meta Webhook verification (`GET`) and event processing (`POST`).
-   - Admin whitelist verification (only configured numbers can execute commands).
-   - Pre-built commands: `/help`, `/status`, `/stats` (fetches today's metrics directly in chat), `/ping`.
-   - Asynchronous execution logging to Cloudflare D1 without delaying the WhatsApp response.
-
-2. **Dashboard Features (`apps/pages`):**
-   - **Daily Unique Numbers Tracker:** Visual progress bar against Meta Tier 0 Limit (250 unique numbers/day).
-   - **Daily Message Counter:** Inbound vs. Outbound chats.
-   - **Cloudflare Usage Overview:** Worker invocations count & D1 read/write approximations.
-   - **Live Chat Logs:** Real-time searchable/filterable table displaying recent messages (Sender, Direction, Message Content, Command Triggered, Execution Latency, Timestamp).
-   - **API Security:** Secure the dashboard monitoring endpoints with a bearer token or basic auth header (`API_SECRET`).
-   - **Responsive UI:** Seamless layout on both mobile devices and desktop screens (Sidebar + Main View).
+### 2. Frontend (`apps/pages`)
+- **Framework:** React + TypeScript via Vite.
+- **Hosting:** Cloudflare Pages.
+- **Styling:** Tailwind CSS + Lucide Icons for a clean, modern, and mobile-first UI.
+- **Visuals:** Recharts for rendering daily chat volume graphs.
+- **Features:** 
+  - **Overview:** Daily KPIs and Meta API limit progress bar.
+  - **Chat History:** WhatsApp Web-style bubble chat interface.
+  - **Statistics:** Inbound vs Outbound message charts.
 
 ---
 
-### 3. MONOREPO PROJECT STRUCTURE
-
-Organize the repository cleanly as follows:
+## 📂 Project Structure
 
 ```text
-wa-automation-suite/
-├── package.json                   # Monorepo root / workspaces config
-├── README.md
-│
+wa-automation-cf-worker/
+├── package.json              # Monorepo root / workspaces config
 ├── apps/
-│   ├── worker/                    # Backend (Cloudflare Workers)
-│   │   ├── wrangler.toml          # D1, KV bindings, and environment configs
-│   │   ├── tsconfig.json
-│   │   ├── package.json
-│   │   ├── schema.sql             # Cloudflare D1 SQL table schemas (logs, metrics)
-│   │   └── src/
-│   │       ├── index.ts           # Hono entrypoint (routes for webhook & dashboard API)
-│   │       ├── config/            # Env and secret bindings validator
-│   │       ├── controllers/
-│   │       │   ├── webhook.ts     # WhatsApp Meta webhook logic
-│   │       │   └── stats.ts       # Metrics & logs API endpoints for Pages
-│   │       ├── middlewares/
-│   │       │   ├── auth.ts        # Admin whitelist & Dashboard token verification
-│   │       │   └── errorHandler.ts
-│   │       ├── services/
-│   │       │   ├── dbService.ts   # D1 database operations & metrics aggregation
-│   │       │   ├── whatsapp.ts    # Meta Graph API sender
-│   │       │   └── command.ts     # Bot command handler (/help, /status, etc.)
-│   │       └── types/             # Shared TypeScript schemas
+│   ├── worker/               # Backend (Cloudflare Workers)
+│   │   ├── src/
+│   │   │   ├── index.ts      # Main Hono router
+│   │   │   ├── controllers/  # Webhook & API handlers
+│   │   │   ├── middlewares/  # Basic Auth & error handlers
+│   │   │   └── services/     # DB, WhatsApp, Gemini, Knowledge handlers
+│   │   ├── schema.sql        # Cloudflare D1 Schema
+│   │   └── wrangler.toml     # Cloudflare Worker configuration & bindings
 │   │
-│   └── pages/                     # Frontend (Cloudflare Pages)
-│       ├── package.json
-│       ├── tsconfig.json
-│       ├── vite.config.ts
-│       ├── tailwind.config.js
-│       └── src/
-│           ├── App.tsx
-│           ├── main.tsx
-│           ├── components/
-│           │   ├── Navbar.tsx
-│           │   ├── MetricCard.tsx       # KPI counters (Daily limit, messages, latency)
-│           │   ├── UsageProgressBar.tsx # Meta 250 limit visualizer
-│           │   ├── AnalyticsChart.tsx   # Inbound/Outbound volume graph
-│           │   └── LogsTable.tsx        # Responsive chat log table with filters
-│           ├── services/
-│           │   └── api.ts               # Worker API client
-│           └── types/                   # Frontend interfaces
+│   └── pages/                # Frontend (Cloudflare Pages)
+│       ├── src/
+│       │   ├── App.tsx       # Routing (React Router)
+│       │   ├── components/   # UI Components (MetricCards, Layout)
+│       │   └── pages/        # Main Views (Overview, ChatHistory, Statistics, Login)
+│       └── vite.config.ts    # Vite bundler config
 ```
 
+---
 
+## ⚙️ Prerequisites
 
-### 4. D1 DATABASE SCHEMA (schema.sql)
-Please provide complete SQL schema definitions for:
-- chat_logs: id, sender_number, direction (IN/OUT), message_text, command, status, latency_ms, created_at.
-- daily_metrics: date, unique_senders_count, total_inbound, total_outbound.
+Before you start, make sure you have:
+1. [Node.js](https://nodejs.org/) (v18+)
+2. [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) installed globally (`npm install -g wrangler`)
+3. A Cloudflare Account.
+4. A Meta Developer Account with a WhatsApp App set up.
+5. Google Gemini API Key.
 
-```sql
+---
 
-CREATE TABLE IF NOT EXISTS chat_logs (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  sender_number TEXT NOT NULL,
-  direction TEXT NOT NULL,  -- 'IN' | 'OUT'
-  message_text TEXT,
-  command TEXT,
-  status TEXT,               -- 'SUCCESS' | 'ERROR'
-  latency_ms INTEGER,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+## 🚀 Setup & Installation
 
--- Add indexes for better query performance
-CREATE INDEX IF NOT EXISTS idx_chat_logs_sender ON chat_logs(sender_number);
-CREATE INDEX IF NOT EXISTS idx_chat_logs_date ON chat_logs(created_at);
-
-CREATE TABLE IF NOT EXISTS daily_metrics (
-  date TEXT PRIMARY KEY,     -- 'YYYY-MM-DD'
-  unique_senders_count INTEGER DEFAULT 0,
-  total_inbound INTEGER DEFAULT 0,
-  total_outbound INTEGER DEFAULT 0
-);
+### 1. Install Dependencies
+Run the following at the root of the project to install all dependencies for both apps:
+```bash
+npm install
 ```
 
-### 5. CODE OUTPUT REQUIREMENTS
-Provide copy-pasteable files for critical modules in both apps/worker and apps/pages.
+### 2. Setup Cloudflare D1 Database
+Create a new D1 database via Wrangler:
+```bash
+wrangler d1 create wa_automation_db
+```
+*Note down the `database_name` and `database_id` provided by the output and update `apps/worker/wrangler.toml`.*
 
-Ensure TypeScript strictness and defensive error handling.
+Run the SQL migration to create tables:
+```bash
+cd apps/worker
+wrangler d1 execute wa_automation_db --local --file=schema.sql
+# For production:
+# wrangler d1 execute wa_automation_db --remote --file=schema.sql
+```
 
-Provide step-by-step setup commands:
-- Creating D1 database via wrangler d1 create & running migrations.
-- Setting secrets (WA_ACCESS_TOKEN, WA_PHONE_NUMBER_ID, VERIFY_TOKEN, DASHBOARD_SECRET).
-- Local development with Wrangler & Pages preview.
-- Production deployment guidelines.
+### 3. Configure Environment Variables
+You need to set up environment variables for both the **Worker** and the **Pages** app.
+
+**For Worker (`apps/worker/.dev.vars`):**
+Create a `.dev.vars` file in `apps/worker/` based on the `.env.example`:
+```env
+WA_PHONE_NUMBER_ID="your_whatsapp_phone_number_id"
+WA_ACCESS_TOKEN="your_whatsapp_access_token"
+VERIFY_TOKEN="your_webhook_verify_token"
+DASHBOARD_USERNAME="admin@example.com"
+DASHBOARD_PASSWORD="secure_password"
+ADMIN_NUMBERS="6281234567890"
+GEMINI_API_KEY="your_gemini_api_key"
+GEMINI_MODEL="gemini-flash-lite-latest"
+```
+
+**For Pages (`apps/pages/.env`):**
+Create an `.env` file in `apps/pages/` for local development:
+```env
+VITE_API_URL="http://localhost:8787"
+VITE_DEFAULT_USERNAME="admin@example.com"
+VITE_DEFAULT_PASSWORD="secure_password"
+```
+
+---
+
+## 👨‍💻 Local Development
+
+You can run both the frontend and backend concurrently.
+
+**Start the Worker (Backend):**
+```bash
+cd apps/worker
+npm run dev
+```
+*The API will be available at `http://localhost:8787`*
+
+**Start the Pages (Frontend):**
+```bash
+cd apps/pages
+npm run dev
+```
+*The Dashboard will be available at `http://localhost:5173`*
+
+---
+
+## 🚢 Deployment
+
+### 1. Deploy the Backend (Worker)
+Set up your production secrets first. Run the following commands and paste the respective values:
+```bash
+wrangler secret put WA_PHONE_NUMBER_ID
+wrangler secret put WA_ACCESS_TOKEN
+wrangler secret put VERIFY_TOKEN
+wrangler secret put DASHBOARD_USERNAME
+wrangler secret put DASHBOARD_PASSWORD
+wrangler secret put ADMIN_NUMBERS
+wrangler secret put GEMINI_API_KEY
+wrangler secret put GEMINI_MODEL
+```
+
+Deploy to Cloudflare:
+```bash
+cd apps/worker
+npm run deploy
+```
+
+### 2. Deploy the Frontend (Pages)
+Before deploying, make sure to update `apps/pages/.env.production` with your live Worker URL:
+```env
+VITE_API_URL="https://wa-automation-worker.your-subdomain.workers.dev"
+```
+
+Build and deploy:
+```bash
+cd apps/pages
+npm run build
+npx wrangler pages deploy dist --project-name wa-automation-pages --branch main
+```
+
+---
+
+## 🛡️ Security
+- **Webhook Verification:** The bot only accepts incoming events from Meta after validating the `VERIFY_TOKEN`.
+- **Admin Dashboard Auth:** The Worker backend exposes dashboard APIs protected by a Basic Auth layer based on the `DASHBOARD_USERNAME` and `DASHBOARD_PASSWORD` environment variables.
+- **Admin Command Restrictions:** Only WhatsApp numbers listed in `ADMIN_NUMBERS` can execute special administrative commands.
+
+---
+
+*Built for speed, scalability, and seamless integration on the Edge.* ☁️
