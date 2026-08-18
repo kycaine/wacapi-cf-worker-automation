@@ -3,7 +3,7 @@ import { Bindings } from '../types';
 export class WhatsAppService {
   constructor(private env: Bindings) {}
 
-  async sendMessage(to: string, message: string): Promise<boolean> {
+  async sendMessage(to: string, message: string): Promise<{success: boolean, error?: string}> {
     const url = `https://graph.facebook.com/v20.0/${this.env.WA_PHONE_NUMBER_ID}/messages`;
     
     try {
@@ -26,13 +26,13 @@ export class WhatsAppService {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('WhatsApp API Error:', errorText);
-        return false;
+        return { success: false, error: errorText };
       }
 
-      return true;
-    } catch (e) {
+      return { success: true };
+    } catch (e: any) {
       console.error('WhatsApp Service Error:', e);
-      return false;
+      return { success: false, error: e.message || String(e) };
     }
   }
 }

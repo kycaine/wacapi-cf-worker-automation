@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, LogOut, Menu, X, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, LogOut, Menu, X, BarChart3, Terminal } from 'lucide-react';
 import { logout } from '../services/api';
 
 const DashboardLayout: React.FC = () => {
@@ -40,6 +40,10 @@ const DashboardLayout: React.FC = () => {
                 <MessageSquare className="mr-4 h-6 w-6 text-gray-500 group-hover:text-gray-500" />
                 Chat History
               </NavLink>
+              <NavLink to="/logs" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `group flex items-center px-2 py-2 text-base font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
+                <Terminal className="mr-4 h-6 w-6 text-gray-500 group-hover:text-gray-500" />
+                Logs
+              </NavLink>
               <NavLink to="/stats" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `group flex items-center px-2 py-2 text-base font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
                 <BarChart3 className="mr-4 h-6 w-6 text-gray-500 group-hover:text-gray-500" />
                 Statistics
@@ -72,6 +76,10 @@ const DashboardLayout: React.FC = () => {
                 <NavLink to="/chats" className={({ isActive }) => `group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
                   <MessageSquare className="mr-3 h-6 w-6 text-gray-500 group-hover:text-gray-500" />
                   Chat History
+                </NavLink>
+                <NavLink to="/logs" className={({ isActive }) => `group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
+                  <Terminal className="mr-3 h-6 w-6 text-gray-500 group-hover:text-gray-500" />
+                  Logs
                 </NavLink>
                 <NavLink to="/stats" className={({ isActive }) => `group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
                   <BarChart3 className="mr-3 h-6 w-6 text-gray-500 group-hover:text-gray-500" />

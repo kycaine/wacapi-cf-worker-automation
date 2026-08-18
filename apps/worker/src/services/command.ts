@@ -93,14 +93,30 @@ export class CommandService {
         reply = `Unknown command: ${message}\nType /help to see available commands.`;
       }
     } else {
-
       const geminiService = new GeminiService(this.env);
-      const recentLogs = await this.dbService.getRecentLogsForSender(senderNumber, 10);
-      reply = await geminiService.generateResponse(message, recentLogs);
+      try {
+        const recentLogs = await this.dbService.getRecentLogsForSender(senderNumber, 10);
+        reply = await geminiService.generateResponse(message, recentLogs);
+        if (!reply) {
+          reply = "whatsapp sering dalam perbaikan, coba hubungi admin wa.me/6285176861181";
+        }
+      } catch (err) {
+        console.error("Error generating response or fetching logs:", err);
+        reply = "whatsapp sering dalam perbaikan, coba hubungi admin wa.me/6285176861181";
+      }
     }
     if (reply) {
       const start = Date.now();
-      const success = await this.waService.sendMessage(senderNumber, reply);
+      let sendResult = await this.waService.sendMessage(senderNumber, reply);
+
+      if (!sendResult.success) {
+        console.error("Meta API Error saat mengirim balasan. Mencoba kirim pesan fallback...");
+        const fallbackMsg = "whatsapp sering dalam perbaikan, coba hubungi admin wa.me/6285176861181";
+        const fallbackResult = await this.waService.sendMessage(senderNumber, fallbackMsg);
+
+        sendResult.error = sendResult.error + " | Fallback sent: " + fallbackResult.success;
+      }
+
       const latency = Date.now() - start;
 
       const date = new Date().toISOString().split('T')[0];
@@ -108,13 +124,13 @@ export class CommandService {
       await this.dbService.logChat({
         sender_number: senderNumber,
         direction: 'OUT',
-        message_text: reply,
+        message_text: sendResult.success ? reply : `[API ERROR] ${sendResult.error}\n\n[Original Msg] ${reply}`,
         command: text.startsWith('/') ? text.split(' ')[0] : null,
-        status: success ? 'SUCCESS' : 'ERROR',
+        status: sendResult.success ? 'SUCCESS' : 'ERROR',
         latency_ms: latency
       });
 
-      if (success) {
+      if (sendResult.success) {
         await this.dbService.recordMetrics(date, senderNumber, 'OUT');
       }
     }

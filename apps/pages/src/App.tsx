@@ -4,6 +4,7 @@ import DashboardLayout from './components/DashboardLayout';
 import Overview from './pages/Overview';
 import ChatHistory from './pages/ChatHistory';
 import Statistics from './pages/Statistics';
+import Logs from './pages/Logs';
 import Login from './pages/Login';
 import { isAuthenticated } from './services/api';
 
@@ -30,6 +31,7 @@ function App() {
           <Route index element={<Navigate to="/overview" replace />} />
           <Route path="overview" element={<Overview />} />
           <Route path="chats" element={<ChatHistory />} />
+          <Route path="logs" element={<Logs />} />
           <Route path="stats" element={<Statistics />} />
         </Route>
       </Routes>
