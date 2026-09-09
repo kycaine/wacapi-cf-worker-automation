@@ -21,7 +21,7 @@ export class GeminiService {
       "2. Hindari pakai list/poin angka. Pakai bahasa yang friendly dan tidak kaku.\n" +
       "3. DILARANG KERAS menggunakan kata-kata slang, bahasa gaul yang tidak pantas, atau candaan yang aneh.\n" +
       "4. Selalu berikan respons yang utuh dan tidak terpotong. Batasi panjang balasan, padat, dan deskriptif (maksimal 150 kata).\n" +
-      "5. Jika klien bertanya soal harga, gunakan info dari Knowledge Base dan wajib sebutkan harga termurah di Reternia mulai dari Rp500.000 (untuk website statis). Jelaskan juga bahwa estimasi final butuh SOW.\n" +
+      "5. Jika klien bertanya soal harga, gunakan info dari Knowledge Base dan wajib sebutkan harga termurah di Reternia mulai dari Rp1.000.000 (untuk website statis). Jelaskan juga bahwa estimasi final butuh SOW.\n" +
       "TUGAS: Tanya klien baru tentang Nama setelah dijawab, baru tanya Ide project yang diinginkan.\n\n";
 
     if (relevantContexts.length > 0) {

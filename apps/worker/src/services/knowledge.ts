@@ -124,4 +124,63 @@ export class KnowledgeService {
       return [];
     }
   }
+
+  async syncAll(): Promise<{ processed: number, upserted: number }> {
+    if (!this.env.VECTORIZE) {
+      console.warn('VECTORIZE binding not available, skipping sync.');
+      return { processed: 0, upserted: 0 };
+    }
+
+    // Get all entries from D1
+    const { results } = await this.env.DB.prepare(`
+      SELECT id, text_content, created_at 
+      FROM knowledge_base
+    `).all<KnowledgeEntry>();
+    
+    if (!results || results.length === 0) return { processed: 0, upserted: 0 };
+
+    const vectorsToUpsert = [];
+    
+    // Generate embeddings and upsert
+    for (const entry of results) {
+      // Chunking shouldn't be strictly necessary if they just replaced the text, 
+      // but let's assume text_content is one chunk for existing IDs.
+      const embedding = await this.embeddingService.generateEmbedding(entry.text_content);
+      vectorsToUpsert.push({
+        id: entry.id,
+        values: embedding,
+        metadata: {
+          text: entry.text_content,
+          source: 'd1-sync',
+          timestamp: Date.now()
+        }
+      });
+    }
+
+    if (vectorsToUpsert.length > 0) {
+      // Upsert to Vectorize
+      await this.env.VECTORIZE.upsert(vectorsToUpsert);
+    }
+
+    return { processed: results.length, upserted: vectorsToUpsert.length };
+  }
+
+  async clearAll(): Promise<{ deleted: number }> {
+    const { results } = await this.env.DB.prepare(`
+      SELECT id FROM knowledge_base
+    `).all<{ id: string }>();
+
+    if (results && results.length > 0) {
+      const ids = results.map(r => r.id);
+      
+      // Delete from Vectorize in batches of 100 to avoid limits, or just all if small
+      if (this.env.VECTORIZE) {
+        // max 1000 ids per request usually, our data is small
+        await this.env.VECTORIZE.deleteByIds(ids);
+      }
+    }
+
+    await this.env.DB.prepare('DELETE FROM knowledge_base').run();
+    return { deleted: results ? results.length : 0 };
+  }
 }

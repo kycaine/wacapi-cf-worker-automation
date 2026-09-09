@@ -22,6 +22,29 @@ app.get('/api/stats/logs', adminAuth, getRecentLogs);
 app.get('/api/stats/contacts', adminAuth, getContacts);
 app.get('/api/stats/logs/:number', adminAuth, getLogsForSender);
 
+import { KnowledgeService } from './services/knowledge';
+app.get('/api/knowledge/sync', adminAuth, async (c) => {
+  const env = c.env as any; // Type workaround for Hono bindings if needed
+  const knowledgeService = new KnowledgeService(env);
+  const result = await knowledgeService.syncAll();
+  return c.json({ success: true, ...result });
+});
+
+app.post('/api/knowledge/ingest', adminAuth, async (c) => {
+  const body = await c.req.json();
+  const env = c.env as any;
+  const knowledgeService = new KnowledgeService(env);
+  const result = await knowledgeService.ingest(body.text);
+  return c.json({ success: true, ids: result });
+});
+
+app.post('/api/knowledge/clear', adminAuth, async (c) => {
+  const env = c.env as any;
+  const knowledgeService = new KnowledgeService(env);
+  const result = await knowledgeService.clearAll();
+  return c.json({ success: true, ...result });
+});
+
 import { DbService } from './services/dbService';
 
 export default {
