@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Send, Clock, AlertCircle } from 'lucide-react';
+import { User, Send, Clock, AlertCircle, ArrowLeft } from 'lucide-react';
 import api from '../services/api';
 
 interface Contact {
@@ -76,9 +76,9 @@ const ChatInterface: React.FC = () => {
   };
 
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden flex h-[600px] border border-gray-200">
+    <div className="bg-white shadow rounded-lg overflow-hidden flex h-[600px] md:h-[700px] border border-gray-200">
       {/* Sidebar */}
-      <div className="w-1/3 border-r border-gray-200 flex flex-col bg-gray-50">
+      <div className={`${selectedContact ? 'hidden md:flex' : 'flex'} w-full md:w-1/3 border-r border-gray-200 flex-col bg-gray-50`}>
         <div className="p-4 border-b border-gray-200 bg-white">
           <h2 className="text-lg font-medium text-gray-900">Recent Chats</h2>
         </div>
@@ -114,11 +114,17 @@ const ChatInterface: React.FC = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="w-2/3 flex flex-col bg-[#efeae2]">
+      <div className={`${!selectedContact ? 'hidden md:flex' : 'flex'} w-full md:w-2/3 flex-col bg-[#efeae2]`}>
         {selectedContact ? (
           <>
             {/* Header */}
             <div className="p-4 border-b border-gray-200 bg-white flex items-center shadow-sm z-10">
+              <button 
+                onClick={() => setSelectedContact(null)}
+                className="md:hidden mr-3 p-1 rounded-full hover:bg-gray-100 text-gray-600"
+              >
+                <ArrowLeft className="h-6 w-6" />
+              </button>
               <div className="bg-gray-200 p-2 rounded-full mr-3">
                 <User className="h-5 w-5 text-gray-600" />
               </div>
